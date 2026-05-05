@@ -26,6 +26,7 @@
           </div>
     </div>
     <script>
+      // Load status
       fetch('status.json')
         .then(r=>r.json())
         .then(status=>{
@@ -37,6 +38,33 @@
             const state = status[agent]||'offline';
             span.textContent = `Status: ${state}`;
             col.appendChild(span);
+          });
+        });
+      // Load recent tasks (always show column)
+      fetch('tasks.json')
+        .then(r=>r.json())
+        .then(tasks=>{
+          document.querySelectorAll('.col').forEach(col=>{
+            const agent = col.querySelector('h2').innerText.trim();
+            const header = document.createElement('strong');
+            header.textContent='Последние задачи:';
+            col.appendChild(header);
+            const list = document.createElement('ul');
+            list.style.marginTop='0.5rem';
+            const arr = tasks[agent]||[];
+            // Populate list (may be empty)
+            arr.forEach(item=>{
+              const li = document.createElement('li');
+              li.textContent = item;
+              list.appendChild(li);
+            });
+            // If no tasks, add placeholder
+            if(arr.length===0){
+              const li = document.createElement('li');
+              li.textContent='—';
+              list.appendChild(li);
+            }
+            col.appendChild(list);
           });
         });
     </script>
