@@ -27,7 +27,7 @@ id_to_name() {
 
 # Extract tasks, sort by createdAt descending, limit per agent
 # We'll collect up to 4 entries (running + 3 recent) per agent
-echo "$JSON" | jq -r '.tasks.tasks[] | "\(.agentId)\t\(.label)\t\(.status)\t\(.createdAt)"' | \
+echo "$JSON" | jq -r '.tasks[] | "\(.agentId)\t\(.label)\t\(.status)\t\(.createdAt)"' | \
   sort -t $'\t' -k4,4nr | \
   while IFS=$'\t' read -r agentId label status createdAt; do
     name=$(id_to_name "$agentId")
