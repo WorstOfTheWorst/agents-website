@@ -23,7 +23,22 @@
     <div class="col">
       <h2>OpenClaw</h2>
       <p>Главный агент‑ассистент, обслуживает все остальные суб‑агенты, управляет задачами, планированием и интеграцией.</p>
+          </div>
     </div>
-  </div>
+    <script>
+      fetch('status.json')
+        .then(r=>r.json())
+        .then(status=>{
+          document.querySelectorAll('.col').forEach(col=>{
+            const agent = col.querySelector('h2').innerText.trim();
+            const span = document.createElement('span');
+            span.style.display='block';
+            span.style.marginTop='0.5rem';
+            const state = status[agent]||'offline';
+            span.textContent = `Status: ${state}`;
+            col.appendChild(span);
+          });
+        });
+    </script>
 </body>
 </html>
