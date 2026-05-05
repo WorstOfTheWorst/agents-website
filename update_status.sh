@@ -32,17 +32,18 @@ for a in $online_agents; do
   statusMap["$name"]="online"
  done
 
-# Analyze tasks to refine statuses
-# For each running or queued task, set a specific status
-echo "$JSON" | jq -r '.tasks.tasks[] | select(.status=="running" or .status=="queued") | "\(.agentId)\t\(.label)\t\(.status)"' |
-while IFS=$'\t' read -r agentId label taskStatus; do
-  name=$(id_to_name "$agentId")
-  if [[ "$taskStatus" == "running" ]]; then
-    statusMap["$name"]="Работает над: $label"
-  else
-    statusMap["$name"]="Ожидает задачу"
-  fi
- done
+# Analyze tasks to refine statuses (if task data exists)
+if echo "$JSON" | jq -e '.tasks.tasks' >/dev/null 2>&1; then
+  echo "$JSON" | jq -r '.tasks.tasks[] | select(.status=="running" or .status=="queued") | "\(.agentId)\t\(.label)\t\(.status)"' |
+  while IFS=$'\t' read -r agentId label taskStatus; do
+    name=$(id_to_name "$agentId")
+    if [[ "$taskStatus" == "running" ]]; then
+      statusMap["$name"]="Работает над: $label"
+    else
+      statusMap["$name"]="Ожидает задачу"
+    fi
+  done
+fi
 
 # Any agent still marked as "online" without a specific task becomes "Спит"
 for name in "Алексей" "Маришка" "OpenClaw"; do
