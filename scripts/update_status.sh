@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Update status.json with simplified statuses: online, offline, inWork
-STATUS_FILE="$(dirname "$0")/status.json"
+STATUS_FILE="$(dirname "$0")/data/status.json"
 
 # Fetch full OpenClaw status JSON
 JSON=$(openclaw status --json 2>/dev/null)

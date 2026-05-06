@@ -47,10 +47,18 @@
       <div class="status"></div>
       <div class="tasks"></div>
     </div>
+    <div class="col">
+      <div class="info">
+        <h2>ComfyUI</h2>
+        <p>Сервис генеративного графического движка ComfyUI.</p>
+      </div>
+      <div class="status" id="comfyui-status">checking...</div>
+      <div class="tasks"></div>
+    </div>
     </div>
     <script>
       // Load status and apply color classes
-      fetch('status.json')
+      fetch('data/status.json')
         .then(r=>r.json())
         .then(status=>{
           document.querySelectorAll('.col').forEach(col=>{
@@ -62,7 +70,7 @@
           });
         });
       // Load recent tasks with human‑readable details
-      fetch('agents_tasks_detail_human.json')
+      fetch('data/agents_tasks_detail_human.json')
         .then(r=>r.json())
         .then(tasks=>{
           document.querySelectorAll('.col').forEach(col=>{
