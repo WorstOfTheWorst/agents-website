@@ -1,43 +1,47 @@
 # INSTRUCTIONS.md – agents‑website
 
 ## Описание проекта
-`agents‑website` — статический сайт, служит фронтендом для управления агентами OpenClaw. Хранит JSON‑файлы со статусами задач, скрипты для обновления статуса и простой HTML‑интерфейс.
+`agents‑website` — статический дашборд, показывающий статус агентов OpenClaw, последние задачи и доступность ComfyUI. Данные берутся из JSON‑файлов, которые обновляются постоянно сервисом `real_time_updater.py`.
 
-## Структура каталога
+## Структура проекта
 ```
 agents‑website/
-├─ index.html                                 # Главная страница сайта
+├─ index.html                     # главная страница (авто‑обновление каждые 30 сек)
 ├─ data/
-│   ├─ status.json                          # Текущий статус агентов + ComfyUI
-│   └─ agents_tasks_detail_human.json        # Человекочитаемый список последних задач (по 5 на агента)
+│   ├─ status.json                # текущий статус агентов + ComfyUI
+│   └─ agents_tasks_detail_human.json  # человекочитаемый список последних 5 задач на каждый агент
 ├─ scripts/
-│   ├─ update_status.sh                     # Обновляет data/status.json (агенты + ComfyUI)
-│   └─ update_agent_tasks_detail_human.sh    # Обновляет data/agents_tasks_detail_human.json
+│   ├─ check_comfy_status.py      # одноразовая проверка доступности ComfyUI (записывает в data/status.json)
+│   └─ (deprecated)                # старые bash‑скрипты удалены, обновление теперь выполняет сервис
 ├─ service/
-│   └─ real_time_updater.py                 # Python‑сервис, постоянно обновляет статус, задачи и ComfyUI
-├─ check_comfy_status.py                      # (перемещён в scripts/ в рамках сервис‑логики)
-├─ setup_agents_website.sh                    # systemd‑служба для быстрой публикации сайта
-└─ INSTRUCTIONS.md                            # **Этот файл** – справка по проекту
+│   └─ real_time_updater.py       # Python‑сервис, каждые 2 мин обновляет статус, задачи и ComfyUI (ограничение памяти 200 MiB)
+├─ setup_agents_website.sh        # systemd‑служба для быстрого развёртывания сайта (Python http.server на порту 8000)
+└─ INSTRUCTIONS.md                # этот файл – справка по проекту
 ```
 
-## Назначение ключевых скриптов
-- **`setup_agents_website.sh`** – инициализирует проект, копирует шаблоны, проверяет зависимости.
-- **`update_agent_tasks_detail_human.sh`** – генерирует человекочитаемый JSON‑отчёт о текущих задачах агентов.
-- **`update_status.sh`** – обновляет `status.json` (например, актуальное количество активных агентов, время последнего обновления).
+## Назначение ключевых компонентов
+- **`setup_agents_website.sh`** – создаёт/перезапускает systemd‑юнит `agents-website.service`, который обслуживает каталог `index.html` через `python3 -m http.server`.
+- **`service/real_time_updater.py`** – постоянно (каждые 120 сек) собирает статус OpenClaw, проверяет ComfyUI (`http://192.168.0.113:8188`) и пишет результаты в `data/status.json` и `data/agents_tasks_detail_human.json` атомарно.
+- **`scripts/check_comfy_status.py`** – удобный однократный скрипт для быстрых проверок ComfyUI (если сервис ещё не запущен).
 
 ## Как использовать
-1. **Первичная инициализация**
+1. **Инициализация**
    ```bash
    cd /home/dmitriy/.openclaw/workspace/Projects/agents-website
-   ./setup_agents_website.sh
+   ./setup_agents_website.sh   # создаст и запустит systemd‑службу
    ```
-2. **Обновление статусов**
+2. **Запуск постоянного обновления**
    ```bash
-   ./update_status.sh
-   ./update_agent_tasks_detail_human.sh
+   sudo systemctl enable --now agents-website-updater.service   # (unit создаётся вручную, см. docs)
+   # либо запустить в фоне:
+   python3 service/real_time_updater.py &
    ```
-3. **Запуск сайта**
-   Простой способ – открыть `index.html` в браузере или разместить каталог на любом веб‑сервере (nginx, Apache, python -m http.server).
+3. **Однократная проверка ComfyUI** (если нужен быстрый чек без сервиса)
+   ```bash
+   ./scripts/check_comfy_status.py
+   ```
+4. **Открыть дашборд**
+   Откройте в браузере `http://<host>:8000` (по умолчанию порт 8000). Страница будет автоматически перезагружаться каждые 30 сек., отображая актуальный статус и последние задачи.
 
 ---
-*Как и в остальных проектах, после создания/модификации скриптов вносите краткое описание в этот INSTRUCTIONS.md, чтобы быстро восстановить контекст.*
+*После любых изменений в скриптах или структуре проекта обновляйте этот файл, чтобы сохранять актуальную документацию.*
