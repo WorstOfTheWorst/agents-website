@@ -15,7 +15,7 @@ Type=simple
 ExecStartPre=-/usr/bin/fuser -k 8000/tcp
 WorkingDirectory=/home/dmitriy/.openclaw/workspace/Projects/agents-website
 ExecStart=/usr/bin/python3 -m http.server 8000 --bind 0.0.0.0
-ExecStopPost=/usr/bin/killall -9 python3
+ExecStopPost=/bin/kill -9 $MAINPID
 Restart=on-failure
 
 [Install]

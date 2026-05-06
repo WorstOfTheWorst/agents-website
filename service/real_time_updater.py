@@ -25,7 +25,7 @@ DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 STATUS_FILE = os.path.join(DATA_DIR, "status.json")
 TASKS_FILE = os.path.join(DATA_DIR, "agents_tasks_detail_human.json")
 COMFY_URL = "http://192.168.0.113:8188"
-SLEEP_INTERVAL = 120
+SLEEP_INTERVAL = 30
 
 AGENT_NAMES = {"main": "OpenClaw", "aleksey": "Алексей", "marishka": "Маришка"}
 
