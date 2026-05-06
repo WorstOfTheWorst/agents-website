@@ -7,7 +7,18 @@
     body {font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5;}
     .container {display:flex; max-width:1200px; margin:auto; padding:2rem;}
     .col {flex:1; background:#fff; margin:0.5rem; padding:1rem; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+    .status {font-weight:bold; margin-top:0.5rem; display:flex; align-items:center;}
+        .status::before {content:''; display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; background-color:gray;}
+        .status.online::before {background-color:green;}
+        .status.offline::before {background-color:red;}
+        .status.inWork::before {background-color:purple;}
+    .status.online {color:green;}
+    .status.offline {color:red;}
+    .status.inWork {color:purple;}
     h2 {margin-top:0;}
+    .task-block {border:1px solid #ddd; padding:0.5rem; margin-bottom:0.5rem; background:#fafafa;}
+    .task-block p {margin:0.2rem 0;}
+    .task-sep {border-top:1px solid #bbb; margin:0.5rem 0;}
   </style>
 </head>
 <body>
@@ -38,23 +49,20 @@
     </div>
     </div>
     <script>
-      // Load status
+      // Load status and apply color classes
       fetch('status.json')
         .then(r=>r.json())
         .then(status=>{
           document.querySelectorAll('.col').forEach(col=>{
             const agent = col.querySelector('h2').innerText.trim();
-            const statusDiv = col.querySelector('.status');
-            const span = document.createElement('span');
-            span.style.display='block';
-            span.style.marginTop='0.5rem';
             const state = status[agent]||'offline';
-            span.textContent = `Status: ${state}`;
-            statusDiv.appendChild(span);
+            const statusDiv = col.querySelector('.status');
+            statusDiv.textContent = `Status: ${state}`;
+            statusDiv.className = 'status ' + state; // preserve base class and add state
           });
         });
-      // Load recent tasks (always show column)
-      fetch('tasks.json')
+      // Load recent tasks with human‑readable details
+      fetch('agents_tasks_detail_human.json')
         .then(r=>r.json())
         .then(tasks=>{
           document.querySelectorAll('.col').forEach(col=>{
@@ -63,22 +71,45 @@
             const header = document.createElement('strong');
             header.textContent='Последние задачи:';
             tasksDiv.appendChild(header);
-            const list = document.createElement('ul');
-            list.style.marginTop='0.5rem';
+            const container = document.createElement('div');
             const arr = tasks[agent]||[];
-            // Populate list (may be empty)
+            // Populate with detailed blocks
             arr.forEach(item=>{
-              const li = document.createElement('li');
-              li.textContent = item;
-              list.appendChild(li);
+              const block = document.createElement('div');
+              block.className = 'task-block';
+              if(item.label){
+                const p = document.createElement('p');
+                p.textContent = `Задача: ${item.label}`;
+                block.appendChild(p);
+              }
+              if(item.status){
+                const p = document.createElement('p');
+                p.textContent = `Статус: ${item.status}`;
+                block.appendChild(p);
+              }
+              if(item.startedAt){
+                const p = document.createElement('p');
+                p.textContent = `Время начала: ${item.startedAt}`;
+                block.appendChild(p);
+              }
+              if(item.durationMin !== undefined && item.durationMin !== null){
+                const p = document.createElement('p');
+                p.textContent = `Длительность: ${item.durationMin} мин`;
+                block.appendChild(p);
+              }
+              container.appendChild(block);
+              // separator line
+              const sep = document.createElement('div');
+              sep.className = 'task-sep';
+              container.appendChild(sep);
             });
             // If no tasks, add placeholder
             if(arr.length===0){
-              const li = document.createElement('li');
-              li.textContent='—';
-              list.appendChild(li);
+              const placeholder = document.createElement('p');
+              placeholder.textContent = '—';
+              container.appendChild(placeholder);
             }
-            tasksDiv.appendChild(list);
+            tasksDiv.appendChild(container);
           });
         });
     </script>

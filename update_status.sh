@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Update status.json with detailed agent statuses (online/offline, task info)
+# Update status.json with simplified statuses: online, offline, inWork
 STATUS_FILE="$(dirname "$0")/status.json"
 
 # Fetch full OpenClaw status JSON
@@ -13,7 +13,7 @@ fi
 declare -A statusMap
 for name in "Алексей" "Маришка" "OpenClaw"; do
   statusMap["$name"]="offline"
-done
+ done
 
 # Helper to map internal agent IDs to display names
 id_to_name() {
@@ -25,7 +25,7 @@ id_to_name() {
   esac
 }
 
-# Determine online status from heartbeat configuration
+# Agents with heartbeat enabled are considered online (if no active tasks they stay online)
 online_agents=$(echo "$JSON" | jq -r '.heartbeat.agents[] | select(.enabled == true) | .agentId')
 for a in $online_agents; do
   name=$(id_to_name "$a")
@@ -34,25 +34,16 @@ for a in $online_agents; do
 
 # Analyze tasks to refine statuses (if task data exists)
 if echo "$JSON" | jq -e '.tasks.tasks' >/dev/null 2>&1; then
-  echo "$JSON" | jq -r '.tasks.tasks[] | select(.status=="running" or .status=="queued") | "\(.agentId)\t\(.label)\t\(.status)"' |
-  while IFS=$'\t' read -r agentId label taskStatus; do
+  # Running tasks => inWork
+  echo "$JSON" | jq -r '.tasks.tasks[] | select(.status=="running") | "\(.agentId)"' |
+  while read -r agentId; do
     name=$(id_to_name "$agentId")
-    if [[ "$taskStatus" == "running" ]]; then
-      statusMap["$name"]="Работает над: $label"
-    else
-      statusMap["$name"]="Ожидает задачу"
-    fi
+    statusMap["$name"]="inWork"
   done
+  # Queued tasks keep online status (already set)
 fi
 
-# Any agent still marked as "online" without a specific task becomes "Спит"
-for name in "Алексей" "Маришка" "OpenClaw"; do
-  if [[ "${statusMap[$name]}" == "online" ]]; then
-    statusMap["$name"]="Спит"
-  fi
- done
-
-# Write JSON file safely (handles Cyrillic keys)
+# Write JSON output
 {
   echo "{"
   first=1
@@ -71,3 +62,4 @@ for name in "Алексей" "Маришка" "OpenClaw"; do
   echo "}"
 } > "$STATUS_FILE"
 
+exit 0
