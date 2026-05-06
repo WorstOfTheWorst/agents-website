@@ -2,10 +2,10 @@
   "OpenClaw": [
     {
       "label": "Update site data",
-      "status": "running",
+      "status": "succeeded",
       "startedAt": "08:45",
-      "endedAt": null,
-      "durationMin": null
+      "endedAt": "08:47",
+      "durationMin": 1
     },
     {
       "label": "Add remote and push agents-website",
