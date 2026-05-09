@@ -14,7 +14,7 @@ Type=simple
 # Принудительно освобождаем порт 8000, если он занят
 ExecStartPre=-/usr/bin/fuser -k 8000/tcp
 WorkingDirectory=/home/dmitriy/.openclaw/workspace/Projects/agents-website
-ExecStart=/usr/bin/python3 -m http.server 8000 --bind 0.0.0.0
+ExecStart=/usr/bin/python3 server.py
 ExecStopPost=/bin/kill -9 $MAINPID
 Restart=on-failure
 

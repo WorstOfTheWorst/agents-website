@@ -13,11 +13,15 @@
       <div class="status" id="status-mariska">checking...</div>
     </div>
     <div class="status-item">
+      <div>Алексей</div>
+      <div class="status" id="status-aleksey">checking...</div>
+    </div>
+    <div class="status-item">
       <div>OpenClaw</div>
       <div class="status" id="status-openclaw">checking...</div>
     </div>
     <div class="status-item">
-      <div>ComfyUI</div>
+      <div id="comfyui-label">ComfyUI</div>
       <div class="status" id="status-comfyui">checking...</div>
     </div>
   </div>
@@ -27,6 +31,14 @@
     <div class="status-item">
       <div class="info">
         <h2>Задачи Маришки</h2>
+      </div>
+      <div class="tasks-section">
+        <div class="tasks"></div>
+      </div>
+    </div>
+    <div class="status-item">
+      <div class="info">
+        <h2>Задачи Алексея</h2>
       </div>
       <div class="tasks-section">
         <div class="tasks"></div>
@@ -48,6 +60,13 @@
         <div class="tasks"></div>
       </div>
     </div>
+  </div>
+
+  <!-- Поле ввода IP адреса ComfyUI -->
+  <div class="comfy-ip-input" style="margin: 20px;">
+    <label for="comfy-ip">IP‑адрес ComfyUI:</label>
+    <input type="text" id="comfy-ip" placeholder="например: 192.168.0.113:8188" style="margin-left: 8px;" />
+    <button id="save-comfy-ip" style="margin-left: 8px;">Сохранить</button>
   </div>
 
   <script src="js/script.js"></script>

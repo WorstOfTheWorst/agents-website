@@ -3,8 +3,17 @@ import json
 import os
 import requests
 
+
 def main():
-    url = "http://192.168.0.113:8188"
+    # Читаем IP адрес ComfyUI из конфигурационного файла (data/comfy_ip.json)
+    config_path = os.path.join(os.path.dirname(__file__), "..", "data", "comfy_ip.json")
+    default_url = "http://192.168.0.113:8188"
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            cfg = json.load(f)
+            url = cfg.get("url", default_url)
+    except Exception:
+        url = default_url
     try:
         resp = requests.get(url, timeout=5)
         online = resp.status_code == 200
@@ -13,7 +22,7 @@ def main():
     status = "online" if online else "offline"
 
     # Path to the website data/status.json (relative to this script)
-    status_path = os.path.join(os.path.dirname(__file__), "data", "status.json")
+    status_path = os.path.join(os.path.dirname(__file__), "..", "data", "status.json")
     try:
         with open(status_path, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -27,5 +36,7 @@ def main():
     os.replace(tmp_path, status_path)
     print(f"ComfyUI status updated: {status}")
 
+
 if __name__ == "__main__":
     main()
+

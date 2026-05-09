@@ -10,10 +10,9 @@ The results are written to the `data/` directory of the website so that
 `index.html` can display them instantly.
 
 Run this script as a background service (e.g. via systemd). Adjust the
-`sLEEP_INTERVAL` if you need a different refresh rate.
+`SLEEP_INTERVAL` if you need a different refresh rate.
 """
 
-#!/usr/bin/env python3
 import json
 import os
 import subprocess
@@ -24,10 +23,22 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 STATUS_FILE = os.path.join(DATA_DIR, "status.json")
 TASKS_FILE = os.path.join(DATA_DIR, "agents_tasks_detail_human.json")
-COMFY_URL = "http://192.168.0.113:8188"
+
+COMFY_DEFAULT_URL = "http://192.168.0.113:8188"
 SLEEP_INTERVAL = 30
 
 AGENT_NAMES = {"main": "OpenClaw", "aleksey": "Алексей", "marishka": "Маришка"}
+
+
+def get_comfy_url() -> str:
+    """Load ComfyUI URL from data/comfy_ip.json, fall back to default."""
+    config_path = os.path.join(DATA_DIR, "comfy_ip.json")
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            cfg = json.load(f)
+            return cfg.get("url", COMFY_DEFAULT_URL)
+    except Exception:
+        return COMFY_DEFAULT_URL
 
 
 def id_to_name(agent_id: str) -> str:
@@ -49,9 +60,10 @@ def run_cmd(cmd: list[str]) -> str:
         return ""
 
 
-def update_status():
+def get_agent_status() -> dict:
+    """Return a dict with the status of OpenClaw agents (excluding ComfyUI)."""
     raw = run_cmd(["openclaw", "status", "--json"])
-    status_map = {name: "offline" for name in ["Алексей", "Маришка", "OpenClaw", "ComfyUI"]}
+    status_map = {name: "offline" for name in ["Алексей", "Маришка", "OpenClaw"]}
 
     if raw:
         try:
@@ -67,13 +79,24 @@ def update_status():
                     if name in status_map:
                         status_map[name] = "inWork"
         except Exception as e:
-            print(f"[{time.strftime('%H:%M:%S')}] [update_status] ошибка парсинга: {e}", flush=True)
+            print(f"[{time.strftime('%H:%M:%S')}] [get_agent_status] ошибка парсинга: {e}", flush=True)
+    return status_map
 
+
+def check_comfy_ui() -> str:
+    """Return 'online' if ComfyUI responds with HTTP 200, otherwise 'offline'."""
     try:
-        r = requests.get(COMFY_URL, timeout=5)
-        status_map["ComfyUI"] = "online" if r.status_code == 200 else "offline"
+        url = get_comfy_url()
+        r = requests.get(url, timeout=5)
+        return "online" if r.status_code == 200 else "offline"
     except Exception:
-        status_map["ComfyUI"] = "offline"
+        return "offline"
+
+
+def update_status():
+    """Combine agent status and ComfyUI check, then write to the status JSON file."""
+    status_map = get_agent_status()
+    status_map["ComfyUI"] = check_comfy_ui()
 
     tmp_path = STATUS_FILE + ".tmp"
     with open(tmp_path, "w", encoding="utf-8") as f:
@@ -81,15 +104,16 @@ def update_status():
     os.replace(tmp_path, STATUS_FILE)
 
 
-def update_tasks():
+def get_tasks() -> dict:
+    """Fetch the last 5 tasks per agent from `openclaw tasks list --json` and return the grouped dict."""
     raw = run_cmd(["openclaw", "tasks", "list", "--json"])
     if not raw:
-        return
+        return {}
     try:
         data = json.loads(raw)
     except Exception as e:
-        print(f"[{time.strftime('%H:%M:%S')}] [update_tasks] ошибка парсинга: {e}", flush=True)
-        return
+        print(f"[{time.strftime('%H:%M:%S')}] [get_tasks] ошибка парсинга: {e}", flush=True)
+        return {}
 
     transformed = []
     for t in data.get("tasks", []):
@@ -118,7 +142,15 @@ def update_tasks():
         ]
         for name, entries in grouped.items()
     }
+    return result
 
+
+def update_tasks():
+    """Write the result of `get_tasks()` to the tasks JSON file."""
+    result = get_tasks()
+    if not result:
+        print(f"[{time.strftime('%H:%M:%S')}] [update_tasks] пустой результат, файл не обновлён", flush=True)
+        return
     tmp_path = TASKS_FILE + ".tmp"
     with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
