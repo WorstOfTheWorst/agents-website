@@ -5,13 +5,13 @@ import requests
 
 
 def main():
-    # Читаем IP адрес ComfyUI из конфигурационного файла (data/comfy_ip.json)
-    config_path = os.path.join(os.path.dirname(__file__), "..", "data", "comfy_ip.json")
+    # Читаем IP адрес ComfyUI из конфигурационного файла (data/config.json)
+    config_path = os.path.join(os.path.dirname(__file__), "..", "data", "config.json")
     default_url = "http://192.168.0.113:8188"
     try:
         with open(config_path, "r", encoding="utf-8") as f:
             cfg = json.load(f)
-            url = cfg.get("url", default_url)
+            url = cfg.get("comfy_ui", {}).get("url", default_url)
     except Exception:
         url = default_url
     try:

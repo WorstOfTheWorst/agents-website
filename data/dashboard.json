@@ -1,0 +1,149 @@
+{
+  "status": {
+    "Алексей": "offline",
+    "Маришка": "offline",
+    "OpenClaw": "online",
+    "ComfyUI": "online"
+  },
+  "tasks": {
+    "Маришка": [
+      {
+        "label": "Обновление документации",
+        "status": "succeeded",
+        "startedAt": "07:00",
+        "endedAt": "07:19",
+        "date": "15.05.26",
+        "durationMin": 19
+      },
+      {
+        "label": "Обновление документации",
+        "status": "succeeded",
+        "startedAt": "07:00",
+        "endedAt": "07:20",
+        "date": "14.05.26",
+        "durationMin": 20
+      },
+      {
+        "label": "Обновление документации",
+        "status": "failed",
+        "startedAt": "07:00",
+        "endedAt": "07:34",
+        "date": "13.05.26",
+        "durationMin": 34,
+        "error": "Error: Outbound not configured for channel: telegram"
+      },
+      {
+        "label": "Обновление документации",
+        "status": "failed",
+        "startedAt": "07:00",
+        "endedAt": "07:06",
+        "date": "12.05.26",
+        "durationMin": 6,
+        "error": "Error: Outbound not configured for channel: telegram"
+      }
+    ],
+    "OpenClaw": [
+      {
+        "label": null,
+        "status": "failed",
+        "startedAt": "03:01",
+        "endedAt": "03:01",
+        "date": "15.05.26",
+        "durationMin": 0,
+        "error": "Reasoning is required for this model endpoint. Use /think minimal (or any non-off level) and try again."
+      },
+      {
+        "label": null,
+        "status": "failed",
+        "startedAt": "03:00",
+        "endedAt": "03:00",
+        "date": "15.05.26",
+        "durationMin": 0,
+        "error": "Reasoning is required for this model endpoint. Use /think minimal (or any non-off level) and try again."
+      },
+      {
+        "label": null,
+        "status": "failed",
+        "startedAt": "03:00",
+        "endedAt": "03:00",
+        "date": "15.05.26",
+        "durationMin": 0,
+        "error": "Reasoning is required for this model endpoint. Use /think minimal (or any non-off level) and try again."
+      },
+      {
+        "label": null,
+        "status": "failed",
+        "startedAt": "03:00",
+        "endedAt": "03:00",
+        "date": "15.05.26",
+        "durationMin": 0,
+        "error": "Reasoning is required for this model endpoint. Use /think minimal (or any non-off level) and try again."
+      },
+      {
+        "label": null,
+        "status": "failed",
+        "startedAt": "03:00",
+        "endedAt": "03:00",
+        "date": "14.05.26",
+        "durationMin": 0,
+        "error": "Reasoning is required for this model endpoint. Use /think minimal (or any non-off level) and try again."
+      }
+    ],
+    "null": [
+      {
+        "label": "Memory Dreaming Promotion",
+        "status": "succeeded",
+        "startedAt": "03:00",
+        "endedAt": "03:00",
+        "date": "15.05.26",
+        "durationMin": 0
+      },
+      {
+        "label": "Memory Dreaming Promotion",
+        "status": "succeeded",
+        "startedAt": "03:00",
+        "endedAt": "03:00",
+        "date": "14.05.26",
+        "durationMin": 0
+      },
+      {
+        "label": "Memory Dreaming Promotion",
+        "status": "succeeded",
+        "startedAt": "03:00",
+        "endedAt": "03:00",
+        "date": "13.05.26",
+        "durationMin": 0
+      },
+      {
+        "label": "Memory Dreaming Promotion",
+        "status": "succeeded",
+        "startedAt": "03:00",
+        "endedAt": "03:00",
+        "date": "12.05.26",
+        "durationMin": 0
+      },
+      {
+        "label": "Memory Dreaming Promotion",
+        "status": "succeeded",
+        "startedAt": "03:00",
+        "endedAt": "03:00",
+        "date": "11.05.26",
+        "durationMin": 0
+      }
+    ],
+    "ComfyUI": [
+      {
+        "label": "default_api.json",
+        "status": "Успешно",
+        "startedAt": "12:49",
+        "date": "12.05.26"
+      },
+      {
+        "label": "default_api.json",
+        "status": "Ошибка",
+        "startedAt": "12:40",
+        "date": "12.05.26"
+      }
+    ]
+  }
+}
